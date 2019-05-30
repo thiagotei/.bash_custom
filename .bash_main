@@ -109,13 +109,30 @@ export GIT_PS1_SHOWCOLORHINTS=true
 
 export GIT_PS1_SHOWUPSTREAM="auto git"
 
+# Determine active Python virtualenv details.
+function set_virtualenv () {
+   if test -z "$VIRTUAL_ENV" ; then
+       PYTHON_VIRTUALENV=""
+   else
+       PYTHON_VIRTUALENV=" ${Blue}[`basename \"$VIRTUAL_ENV\"`]$Color_Off"
+   fi
+}
+
+function my_setup() {
+	set_virtualenv
+	mach="$1"
+	__git_ps1 "$IBlack\u@${mach}$Color_Off${PYTHON_VIRTUALENV}" " $BYellow\w$Color_Off\$ "
+}
+
 # If it is MacOs get hostname using a different function.
 if [ "$(uname)" == "Darwin" ]; then
    machine_name=$(scutil --get ComputerName)
-   export PROMPT_COMMAND='__git_ps1  "$IBlack\u@$machine_name$Color_Off" " $BYellow\w$Color_Off\$ " '
+   #export PROMPT_COMMAND='__git_ps1  "$IBlack\u@$machine_name$Color_Off" " $BYellow\w$Color_Off\$ " '
+   export PROMPT_COMMAND='my_setup "$machine_name"'
 #   echo "###### Called the .profile ########"
 else
-   export PROMPT_COMMAND='__git_ps1  "$IBlack\u@\h$Color_Off" " $BYellow\w$Color_Off\$ " '
+   #export PROMPT_COMMAND='__git_ps1  "$IBlack\u@\h$Color_Off" " $BYellow\w$Color_Off\$ " '
+   export PROMPT_COMMAND='my_setup "\h"'
 fi
 
 export PS2="${BIRed}Cont>$Color_Off" 
